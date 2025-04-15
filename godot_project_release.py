@@ -7,7 +7,7 @@ import shutil
 import re
 from typing import List, IO, Tuple
 
-PROJECT_DIR="../godot_project/"
+PROJECT_DIR="target/godot/godot_project/"
 ADDON_DIR=PROJECT_DIR + "/addons/LayerProcGen/"
 
 PLUGIN_CFG="""
@@ -31,7 +31,7 @@ def get_version():
             if version == "unreleased":
                 is_preview = True
                 continue
-            if not re.fullmatch("\d+\.\d+.\d", version):
+            if not re.fullmatch(r"\d+\.\d+\.\d", version):
                 raise Exception(f"Version doesn't appear to be semver: {version}")
             return version + ("-preview" if is_preview else "")
 
@@ -49,8 +49,8 @@ def build_addon_release():
     # For this one, images should point to local ones in repo, since GitHub otherwise doesn't support large ones.
     readme = open("Documentation/README.md", "r").read()
     # Fix image paths
-    readme = re.sub("\(./([^/]*).png", "(Documentation/\\1.png", readme)
-    readme = re.sub("\(./([^/]*).gif", "(Documentation/\\1.gif", readme)
+    readme = re.sub(r"\(./([^/]*).png", r"(Documentation/\1.png", readme)
+    readme = re.sub(r"\(./([^/]*).gif", r"(Documentation/\1.gif", readme)
     # Reroute local links to online html docs
     readme = readme.replace("(./", "(https://runevision.github.io/LayerProcGen/")
     # Change links to other markdown pages to links to generated html pages

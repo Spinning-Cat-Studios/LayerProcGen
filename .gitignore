@@ -27,3 +27,6 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
+
+# Build results
+target/godot/*

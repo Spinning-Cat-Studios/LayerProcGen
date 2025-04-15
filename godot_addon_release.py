@@ -7,7 +7,7 @@ import shutil
 import re
 from typing import List, IO, Tuple
 
-ADDON_DIR="../addon/"
+ADDON_DIR="target/godot/addon/"
 
 PLUGIN_CFG="""
 [plugin]
@@ -30,7 +30,7 @@ def get_version():
             if version == "unreleased":
                 is_preview = True
                 continue
-            if not re.fullmatch("\d+\.\d+.\d", version):
+            if not re.fullmatch(r"\d+\.\d+\.\d", version):
                 raise Exception(f"Version doesn't appear to be semver: {version}")
             return version + ("-preview" if is_preview else "")
 
@@ -38,6 +38,7 @@ def get_version():
 
 def build_addon_release():
     global PLUGIN_CFG
+    version = get_version()
     # Copy source data
     ignored = shutil.ignore_patterns("*.meta", "Unity*", "*.asmdef")
     shutil.copytree("Src/", ADDON_DIR, ignore=ignored, dirs_exist_ok=True)
@@ -45,13 +46,20 @@ def build_addon_release():
     # Create repo readme from documentation front page
     # For this one, images should point to local ones in repo, since GitHub otherwise doesn't support large ones.
     readme = open("Documentation/README.md", "r").read()
+
+    if not re.fullmatch(r"\d+\.\d+\.\d", version):
+        raise Exception(f"Version doesn't appear to be semver: {version}")
+
     # Fix image paths
-    readme = re.sub("\(./([^/]*).png", "(Documentation/\\1.png", readme)
-    readme = re.sub("\(./([^/]*).gif", "(Documentation/\\1.gif", readme)
+    readme = re.sub(r"\(./([^/]*).png", r"(Documentation/\1.png", readme)
+    readme = re.sub(r"\(./([^/]*).gif", r"(Documentation/\1.gif", readme)
+
     # Reroute local links to online html docs
     readme = readme.replace("(./", "(https://runevision.github.io/LayerProcGen/")
+
     # Change links to other markdown pages to links to generated html pages
-    readme = re.sub("/([^/]*).md", "/md_\\1.html", readme)
+    readme = re.sub(r"/([^/]*).md", r"/md_\1.html", readme)
+
     # Write file with warning at top
     open("README.md", "w").write("\n\n<!-- THIS FILE IS AUTO-GENERATED FROM THE DOCS FRONT PAGE -->\n\n\n" + readme)
 
