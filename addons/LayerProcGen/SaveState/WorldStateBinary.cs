@@ -42,7 +42,8 @@ namespace Runevision.SaveState {
 		}
 
 		Dictionary<int, T[]> GetDict<T>() {
-			dicts.TryGetValue(typeof(T), out IDictionary dict);
+			IDictionary? dict = null;
+			dicts.TryGetValue(typeof(T), out dict);
 			if (dict != null)
 				return (Dictionary<int, T[]>)dict;
 			dict = new Dictionary<int, T[]>();
@@ -129,12 +130,16 @@ namespace Runevision.SaveState {
 		T[] DeserializeArray<T>(BinaryReader reader) where T : StateWrapper {
 			int count = reader.ReadInt32();
 			T[] array = new T[count];
-			for (int n = 0; n < count; n++)
-				array[n] = Deserialize<T>(reader);
+			for (int n = 0; n < count; n++) {
+				var value = Deserialize<T>(reader);
+				if (value == null)
+					throw new InvalidDataException($"Deserialization of type {typeof(T)} returned null at index {n}.");
+				array[n] = value;
+			}
 			return array;
 		}
 
-		T Deserialize<T>(BinaryReader reader) where T : StateWrapper {
+		T? Deserialize<T>(BinaryReader reader) where T : StateWrapper {
 			if (typeof(T) == typeof(StateWrapper<bool>)) {
 				return (T)(object)new StateWrapper<bool>(reader.ReadBoolean());
 			}

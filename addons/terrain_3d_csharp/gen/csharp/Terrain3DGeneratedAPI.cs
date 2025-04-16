@@ -499,54 +499,70 @@ public class Terrain3DStorage : _Terrain3DInstanceWrapper_
     {
     }
 
-    private Resource AsResource => Instance as Resource;
+    private Resource? AsResource => Instance as Resource;
 
     public Array<Image> ColorMaps
     {
-        get => AsResource.Get(colormaps_name).AsGodotArray<Image>();
-        set => AsResource.Set(colormaps_name, value);
+        get => AsResource != null ? AsResource.Get(colormaps_name).AsGodotArray<Image>() : new Array<Image>();
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(colormaps_name, value);
+        }
     }
 
     public Array<Image> ControlMaps
     {
-        get => AsResource.Get(controlmaps_name).AsGodotArray<Image>();
-        set => AsResource.Set(controlmaps_name, value);
+        get => AsResource != null ? AsResource.Get(controlmaps_name).AsGodotArray<Image>() : new Array<Image>();
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(controlmaps_name, value);
+        }
     }
 
     public Array<Image> HeightMaps
     {
-        get => AsResource.Get(heightmaps_name).AsGodotArray<Image>();
-        set => AsResource.Set(heightmaps_name, value);
+        get => AsResource != null ? AsResource.Get(heightmaps_name).AsGodotArray<Image>() : new Array<Image>();
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(heightmaps_name, value);
+        }
     }
 
     public Vector2 HeightRange
     {
-        get => AsResource.Get(heightrange_name).AsVector2();
-        set => AsResource.Set(heightrange_name, value);
+        get => AsResource != null ? AsResource.Get(heightrange_name).AsVector2() : default;
+        set { if (AsResource != null) AsResource.Set(heightrange_name, value); }
     }
 
     public Array<Vector2I> RegionOffsets
     {
-        get => AsResource.Get(regionoffsets_name).AsGodotArray<Vector2I>();
-        set => AsResource.Set(regionoffsets_name, value);
+        get => AsResource != null ? AsResource.Get(regionoffsets_name).AsGodotArray<Vector2I>() : new Array<Vector2I>();
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(regionoffsets_name, value);
+        }
     }
 
     public RegionSize RegionSize
     {
-        get => (RegionSize)AsResource.Get(regionsize_name).AsInt32();
-        set => AsResource.Set(regionsize_name, (int)value);
+        get => AsResource != null ? (RegionSize)AsResource.Get(regionsize_name).AsInt32() : default;
+        set { if (AsResource != null) AsResource.Set(regionsize_name, (int)value); }
     }
 
     public bool Save16Bit
     {
-        get => AsResource.Get(save_bit_name).AsBool();
-        set => AsResource.Set(save_bit_name, value);
+        get => AsResource != null ? AsResource.Get(save_bit_name).AsBool() : false;
+        set { if (AsResource != null) AsResource.Set(save_bit_name, value); }
     }
 
     public float Version
     {
-        get => AsResource.Get(version_name).AsSingle();
-        set => AsResource.Set(version_name, value);
+        get => AsResource != null ? AsResource.Get(version_name).AsSingle() : default;
+        set { if (AsResource != null) AsResource.Set(version_name, value); }
     }
 
     public Error AddRegion(Vector3 globalPosition, Image[]? images = default, bool update = true)
@@ -559,97 +575,136 @@ public class Terrain3DStorage : _Terrain3DInstanceWrapper_
 
     public Error ExportImage(String fileName, MapType mapType)
     {
-        return AsResource.Call(export_image_name, fileName, (int)mapType).As<Error>();
+        if (AsResource != null)
+            return AsResource.Call(export_image_name, fileName, (int)mapType).As<Error>();
+        throw new InvalidOperationException("Resource instance is null.");
     }
 
     public void ForceUpdateMaps(MapType mapType = MapType.TYPE_MAX)
     {
-        AsResource.Call(force_update_maps_name, (int)mapType);
+        if (AsResource != null)
+            AsResource.Call(force_update_maps_name, (int)mapType);
+        else
+            throw new InvalidOperationException("Resource instance is null.");
     }
 
     public Color GetColor(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_color_name, globalPosition).As<Color>();
     }
 
     public int GetControl(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(getcontrol_name, globalPosition).AsInt32();
     }
 
     public float GetHeight(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_height_name, globalPosition).AsSingle();
     }
 
     public Image GetMapRegion(MapType mapType, int regionIndex)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_map_region_name, (int)mapType, regionIndex).As<Image>();
     }
 
     public Image[] GetMaps(MapType mapType)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_maps_name, (int)mapType).As<Image[]>();
     }
 
     public Image[] GetMapsCopy(MapType mapType)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_maps_copy_name, (int)mapType).As<Image[]>();
     }
 
     public Vector3 GetMeshVertex(int lod, HeightFilter filter, Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_mesh_vertex_name, lod, (int)filter, globalPosition).AsVector3();
     }
 
     public Vector3 GetNormal(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_normal_name, globalPosition).AsVector3();
     }
 
     public Color GetPixel(MapType mapType, Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_pixel_name, (int)mapType, globalPosition).As<Color>();
     }
 
     public int GetRegionCount()
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_region_count_name).AsInt32();
     }
 
     public int GetRegionIndex(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_region_index_name, globalPosition).AsInt32();
     }
 
     public Vector2I GetRegionOffset(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_region_offset_name, globalPosition).AsVector2I();
     }
 
     public float GetRoughness(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_roughness_name, globalPosition).AsSingle();
     }
 
     public Vector3 GetTextureId(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(get_texture_id_name, globalPosition).AsVector3();
     }
 
     public bool HasRegion(Vector3 globalPosition)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(has_region_name, globalPosition).AsBool();
     }
 
     public void ImportImages(Array<Image> images, Vector3? globalPosition = default, float offset = 0.0f, float scale = 1.0f)
     {
         globalPosition ??= Vector3.Zero;
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(import_images_name, images, (Vector3)globalPosition, offset, scale);
     }
 
     public Image LayeredToImage(MapType mapType)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         return AsResource.Call(layered_to_image_name, (int)mapType).As<Image>();
     }
 
@@ -663,52 +718,74 @@ public class Terrain3DStorage : _Terrain3DInstanceWrapper_
 
     public void RemoveRegion(Vector3 globalPosition, bool update = true)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(remove_region_name, globalPosition, update);
     }
 
     public void Save()
     {
-        AsResource.Call(save_name);
+        if (AsResource != null)
+            AsResource.Call(save_name);
+        else
+            throw new InvalidOperationException("Resource instance is null.");
     }
 
     public void SetColor(Vector3 globalPosition, Color color)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_color_name, globalPosition, color);
     }
 
     public void SetControl(Vector3 globalPosition, uint control)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_control_name, globalPosition, control);
     }
 
     public void SetHeight(Vector3 globalPosition, float height)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_height_name, globalPosition, height);
     }
 
     public void SetMapRegion(MapType mapType, int regionIndex, Image image)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_map_region_name, (int)mapType, regionIndex, image);
     }
 
     public void SetMaps(MapType mapType, Image[] maps)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_maps_name, (int)mapType, maps);
     }
 
     public void SetPixel(MapType mapType, Vector3 globalPosition, Color pixel)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_pixel_name, (int)mapType, globalPosition, pixel);
     }
 
     public void SetRoughness(Vector3 globalPosition, float roughness)
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(set_roughness_name, globalPosition, roughness);
     }
 
     public void UpdateHeightRange()
     {
-        AsResource.Call(update_height_range_name);
+        if (AsResource != null)
+            AsResource.Call(update_height_range_name);
+        else
+            throw new InvalidOperationException("Resource instance is null.");
     }
 }
 
@@ -731,52 +808,113 @@ public class Terrain3DTexture : _Terrain3DInstanceWrapper_
     {
     }
 
-    private Resource AsResource => Instance as Resource;
+    private Resource? AsResource => Instance as Resource;
 
     private Color AlbedoColor
     {
-        get => AsResource.Get(albedo_color_name).AsColor();
-        set => AsResource.Set(albedo_color_name, value);
+        get => AsResource != null ? AsResource.Get(albedo_color_name).AsColor() : default;
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(albedo_color_name, value);
+        }
     }
 
-    public Texture2D AlbedoTexture
+    public Texture2D? AlbedoTexture
     {
-        get => AsResource.Get(albedo_texture_name).As<Texture2D>();
-        set => AsResource.Set(albedo_texture_name, value);
+        get => AsResource != null ? AsResource.Get(albedo_texture_name).As<Texture2D>() : null;
+        set
+        {
+            if (AsResource != null)
+            {
+                if (value != null)
+                    AsResource.Set(albedo_texture_name, value);
+                else
+                    AsResource.Set(albedo_texture_name, "");
+            }
+        }
     }
 
     public string Name
     {
-        get => AsResource.Get(name_name).AsString();
-        set => AsResource.Set(name_name, value);
+        get
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            return AsResource.Get(name_name).AsString();
+        }
+        set
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            AsResource.Set(name_name, value);
+        }
     }
 
-    public Texture2D NormalTexture
+    public Texture2D? NormalTexture
     {
-        get => AsResource.Get(normal_texture_name).As<Texture2D>();
-        set => AsResource.Set(normal_texture_name, value);
+        get
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            return AsResource.Get(normal_texture_name).As<Texture2D>();
+        }
+        set
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            AsResource.Set(normal_texture_name, "");
+        }
     }
 
     public int TextureId
     {
-        get => AsResource.Get(texture_id_name).AsInt32();
-        set => AsResource.Set(texture_id_name, value);
+        get
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            return AsResource.Get(texture_id_name).AsInt32();
+        }
+        set
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            AsResource.Set(texture_id_name, value);
+        }
     }
 
     public float UvRotation
     {
-        get => AsResource.Get(uv_rotation_name).AsSingle();
-        set => AsResource.Set(uv_rotation_name, value);
+        get => AsResource != null ? AsResource.Get(uv_rotation_name).AsSingle() : default;
+        set
+        {
+            if (AsResource != null)
+                AsResource.Set(uv_rotation_name, value);
+            else
+                throw new InvalidOperationException("Resource instance is null.");
+        }
     }
 
     public float UvScale
     {
-        get => AsResource.Get(uv_scale_name).AsSingle();
-        set => AsResource.Set(uv_scale_name, value);
+        get
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            return AsResource.Get(uv_scale_name).AsSingle();
+        }
+        set
+        {
+            if (AsResource == null)
+                throw new InvalidOperationException("Resource instance is null.");
+            AsResource.Set(uv_scale_name, value);
+        }
     }
 
     public void Clear()
     {
+        if (AsResource == null)
+            throw new InvalidOperationException("Resource instance is null.");
         AsResource.Call(clear_name);
     }
 }
@@ -799,7 +937,7 @@ public class Terrain3DTextureList : _Terrain3DInstanceWrapper_
     {
     }
 
-    private Resource AsResource => Instance as Resource;
+    private Resource? AsResource => Instance as Resource;
 
     public Terrain3DTexture[] Textures
     {

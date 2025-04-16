@@ -122,7 +122,7 @@ namespace Runevision.Common {
 			return (a.value != b.value);
 		}
 
-		public override bool Equals(object obj) {
+		public override bool Equals(object? obj) {
 			if (!(obj is DFloat other))
 				return false;
 			return (value == other.value);

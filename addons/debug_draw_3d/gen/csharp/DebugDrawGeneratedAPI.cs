@@ -11,7 +11,7 @@ using System.Linq;
 
 static internal class DebugDraw2D
 {
-    private static GodotObject _instance;
+    private static GodotObject? _instance;
     public static GodotObject Instance
     {
         get
@@ -98,14 +98,18 @@ static internal class DebugDraw2D
         }
     }
     
-    public static DebugDraw2DGraph CreateGraph(StringName title)
+    public static DebugDraw2DGraph? CreateGraph(StringName title)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__create_graph, title));
+            var result = Instance?.Call(__create_graph, title);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -118,14 +122,18 @@ static internal class DebugDraw2D
         }
     }
     
-    public static DebugDraw2DGraph CreateFpsGraph(StringName title)
+    public static DebugDraw2DGraph? CreateFpsGraph(StringName title)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__create_fps_graph, title));
+            var result = Instance?.Call(__create_fps_graph, title);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return null;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -133,7 +141,7 @@ static internal class DebugDraw2D
 #endif
         {
 #if !DEBUG && !FORCED_DD3D
-            return default;
+            return null;
 #endif
         }
     }
@@ -174,14 +182,18 @@ static internal class DebugDraw2D
         }
     }
     
-    public static DebugDraw2DGraph GetGraph(StringName title)
+    public static DebugDraw2DGraph? GetGraph(StringName title)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__get_graph, title));
+            var result = Instance?.Call(__get_graph, title);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw2DGraph)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return null;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -189,7 +201,7 @@ static internal class DebugDraw2D
 #endif
         {
 #if !DEBUG && !FORCED_DD3D
-            return default;
+        return null;
 #endif
         }
     }
@@ -201,7 +213,20 @@ static internal class DebugDraw2D
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (string[])(Instance?.Call(__get_graph_names));
+            var result = Instance?.Call(__get_graph_names);
+            if (result is Variant variant)
+            {
+                if (variant.VariantType == Variant.Type.PackedStringArray)
+                {
+                    return variant.AsStringArray();
+                }
+                else if (variant.VariantType == Variant.Type.Array)
+                {
+                    var arr = variant.AsGodotArray();
+                    return arr.Cast<string>().ToArray();
+                }
+            }
+            return Array.Empty<string>();
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -209,7 +234,7 @@ static internal class DebugDraw2D
 #endif
         {
 #if !DEBUG && !FORCED_DD3D
-            return default;
+            return null;
 #endif
         }
     }
@@ -229,7 +254,7 @@ static internal class DebugDraw2D
 #endif
         {
 #if !DEBUG && !FORCED_DD3D
-            return default;
+            return null;
 #endif
         }
     }
@@ -423,7 +448,10 @@ internal class DebugDraw2DGraph : _DebugDrawInstanceWrapper_
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (StringName)(Instance?.Call(__get_title));
+            var result = Instance?.Call(__get_title);
+            if (result is null)
+                return new StringName();
+            return (StringName)result;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -431,7 +459,7 @@ internal class DebugDraw2DGraph : _DebugDrawInstanceWrapper_
 #endif
         {
 #if !DEBUG && !FORCED_DD3D
-            return default;
+            return null;
 #endif
         }
     }
@@ -623,7 +651,7 @@ internal class DebugDraw2DFPSGraph : DebugDraw2DGraph
 
 static internal class DebugDraw3D
 {
-    private static GodotObject _instance;
+    private static GodotObject? _instance;
     public static GodotObject Instance
     {
         get
@@ -1388,14 +1416,18 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
         Instance?.Call(___manual_unregister);
     }
     
-    public DebugDraw3DScopeConfig SetThickness(float value)
+    public DebugDraw3DScopeConfig? SetThickness(float value)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__set_thickness, value));
+            var result = Instance?.Call(__set_thickness, value);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -1415,7 +1447,7 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (float)(Instance?.Call(__get_thickness));
+            return Instance != null ? (float)Instance.Call(__get_thickness) : default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -1428,14 +1460,18 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
         }
     }
     
-    public DebugDraw3DScopeConfig SetCenterBrightness(float value)
+    public DebugDraw3DScopeConfig? SetCenterBrightness(float value)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__set_center_brightness, value));
+            var result = Instance?.Call(__set_center_brightness, value);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -1455,7 +1491,7 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (float)(Instance?.Call(__get_center_brightness));
+            return Instance != null ? (float)Instance.Call(__get_center_brightness) : default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -1468,14 +1504,18 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
         }
     }
     
-    public DebugDraw3DScopeConfig SetHdSphere(bool value)
+    public DebugDraw3DScopeConfig? SetHdSphere(bool value)
     {
 #if !DEBUG && !FORCED_DD3D
         if (_DebugDrawUtils_.IsCallEnabled)
 #endif
         {
 #if (!DEBUG || FORCED_DD3D) || (DEBUG && !FORCED_DD3D)
-            return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject((GodotObject)Instance?.Call(__set_hd_sphere, value));
+            var result = Instance?.Call(__set_hd_sphere, value);
+            var godotObj = (result as Variant?)?.AsGodotObject();
+            if (godotObj != null)
+                return (DebugDraw3DScopeConfig)_DebugDrawUtils_.CreateWrapperFromObject(godotObj);
+            return default;
 #endif
         }
 #if !DEBUG && !FORCED_DD3D
@@ -1633,7 +1673,7 @@ internal class DebugDraw3DScopeConfig : _DebugDrawInstanceWrapper_, IDisposable
 
 static internal class DebugDrawManager
 {
-    private static GodotObject _instance;
+    private static GodotObject? _instance;
     public static GodotObject Instance
     {
         get
@@ -1672,7 +1712,7 @@ static internal class DebugDrawManager
 
 internal class _DebugDrawInstanceWrapper_ : IDisposable
 {
-    public GodotObject Instance { get; protected set; }
+    public GodotObject? Instance { get; protected set; }
     
     public _DebugDrawInstanceWrapper_(GodotObject _instance)
     {

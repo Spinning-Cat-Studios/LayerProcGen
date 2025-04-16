@@ -4,14 +4,14 @@ using Runevision.LayerProcGen;
 
 public class QueuedGameObjectDestruction: IQueuedAction {
 
-    TransformWrapper transform;
+    TransformWrapper? transform;
     bool destroyMeshes;
 
     /// <summary>
     /// Called by MainThreadActionQueue.
     /// </summary>
     public void Process() {
-        if (transform.transform != null) {
+        if (transform != null && transform.transform != null) {
             transform.transform.QueueFree(); //TODO: Godot handles queue free of meshes on itself, I think
             // if (destroyMeshes)
                 // transform.transform.DestroyIncludingMeshes();

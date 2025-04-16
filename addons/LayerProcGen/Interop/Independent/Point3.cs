@@ -78,7 +78,7 @@ namespace Runevision.Common {
 			return (a.x != b.x) || (a.y != b.y) || (a.z != b.z);
 		}
 
-		public override bool Equals(Object obj) {
+		public override bool Equals(Object? obj) {
 			if (!(obj is Point3 other))
 				return false;
 			return (x == other.x) && (y == other.y) && (z == other.z);

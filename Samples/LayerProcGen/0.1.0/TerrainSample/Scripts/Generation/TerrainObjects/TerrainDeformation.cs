@@ -54,8 +54,8 @@ public static class TerrainDeformation
         Point gridSize,
         Vector2 cellSize,
         IReadOnlyList<DeformationSpec> specs,
-        Func<SpecPointB, SpecPointB> postprocess = null,
-        Func<SpecData, SpecData> postprocessSpecs = null
+        Func<SpecPointB, SpecPointB>? postprocess = null,
+        Func<SpecData, SpecData>? postprocessSpecs = null
     )
     {
         if (specs.Count == 0)

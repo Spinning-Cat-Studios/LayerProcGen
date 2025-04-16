@@ -9,11 +9,13 @@ public class PointsSpawningChunk : LayerChunk<PointsSpawningLayer, PointsSpawnin
 	static ListPool<Point> pointsListPool = new ListPool<Point>(12);
 
 	// Data for this chunk goes here.
-	TransformWrapper chunkParent;
+	TransformWrapper? chunkParent;
 
 	public override void Create(int level, bool destroy) {
 		if (destroy) {
-			QueuedGameObjectDestruction.Enqueue(chunkParent, false);
+			if (chunkParent != null) {
+				QueuedGameObjectDestruction.Enqueue(chunkParent, false);
+			}
 		}
 		else {
 			// Get a List from the list pool.

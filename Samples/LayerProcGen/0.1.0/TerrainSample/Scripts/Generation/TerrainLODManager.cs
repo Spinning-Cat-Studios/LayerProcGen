@@ -9,12 +9,12 @@ namespace Terrain3D.Scripts.Generation.Layers;
 
 public partial class TerrainLODManager : Node
 {
-    public static TerrainLODManager instance;
+    public static TerrainLODManager? instance;
 
     [Export(PropertyHint.NodeType, nameof(Terrain3DBindings.Terrain3D))]
-    public Node3D Terrain3D { get; set; }
+    public Node3D? Terrain3D { get; set; }
 
-    public Terrain3DBindings.Terrain3D terrain3DWrapper;
+    public Terrain3DBindings.Terrain3D? terrain3DWrapper;
 
     static DebugToggle showCollision = DebugToggle.Create(">Terrain3D/Debug/Show Collision");
     static DebugToggle showCheckered = DebugToggle.Create(">Terrain3D/Checkered");
@@ -32,9 +32,9 @@ public partial class TerrainLODManager : Node
 
     class TerrainInfo
     {
-        public Image heightMap;
-        public Image colorMap;
-        public Image controlMap;
+        public Image? heightMap;
+        public Image? colorMap;
+        public Image? controlMap;
     }
 
     struct TerrainLODLayer
@@ -43,7 +43,7 @@ public partial class TerrainLODManager : Node
         public Dictionary<Point, TerrainInfo> chunks;
     }
 
-    TerrainLODLayer[] layers;
+    TerrainLODLayer[]? layers;
     bool anyRegistrationChanges = false;
     GridBounds lastLowerLevelBounds;
 
@@ -52,23 +52,28 @@ public partial class TerrainLODManager : Node
     public override void _Ready()
     {
         instance = this;
-        showCollision.Callback += toggled => terrain3DWrapper.DebugShowCollision = toggled;
-        showCheckered.Callback += toggled => terrain3DWrapper.Material.ShowCheckered = toggled;
-        showGrey.Callback += toggled => terrain3DWrapper.Material.ShowGrey = toggled;
-        showHeightmap.Callback += toggled => terrain3DWrapper.Material.ShowHeightmap = toggled;
-        showRoughmap.Callback += toggled => terrain3DWrapper.Material.ShowRoughmap = toggled;
-        showControlTexture.Callback += toggled => terrain3DWrapper.Material.ShowControlTexture = toggled;
-        showControlBlend.Callback += toggled => terrain3DWrapper.Material.ShowControlBlend = toggled;
-        showAutoShader.Callback += toggled => terrain3DWrapper.Material.ShowAutoshader = toggled;
-        showNavigation.Callback += toggled => terrain3DWrapper.Material.ShowNavigation = toggled;
-        showTextureHeight.Callback += toggled => terrain3DWrapper.Material.ShowTextureHeight = toggled;
-        showTextureNormal.Callback += toggled => terrain3DWrapper.Material.ShowTextureNormal = toggled;
-        showTextureRough.Callback += toggled => terrain3DWrapper.Material.ShowTextureRough = toggled;
-        showVertexGrid.Callback += toggled => terrain3DWrapper.Material.ShowVertexGrid = toggled;
+        showCollision.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.DebugShowCollision = toggled; };
+        showCheckered.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowCheckered = toggled; };
+        showGrey.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowGrey = toggled; };
+        showHeightmap.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowHeightmap = toggled; };
+        showRoughmap.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowRoughmap = toggled; };
+        showControlTexture.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowControlTexture = toggled; };
+        showControlBlend.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowControlBlend = toggled; };
+        showAutoShader.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowAutoshader = toggled; };
+        showNavigation.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowNavigation = toggled; };
+        showTextureHeight.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowTextureHeight = toggled; };
+        showTextureNormal.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowTextureNormal = toggled; };
+        showTextureRough.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowTextureRough = toggled; };
+        showVertexGrid.Callback += toggled => { if (terrain3DWrapper != null) terrain3DWrapper.Material.ShowVertexGrid = toggled; };
         // terrain3D = new Terrain3D(terrain3D);
         // terrain3D.Material = new Terrain3DMaterial();
         // terrain3D.Material.WorldBackground = WorldBackground.NONE;
         // AddChild(terrain3D.AsNode3D);
+        if (Terrain3D == null)
+        {
+            GD.PushError("Terrain3D property is not set on TerrainLODManager.");
+            return;
+        }
         terrain3DWrapper = new Terrain3DBindings.Terrain3D(Terrain3D);
         layers = new TerrainLODLayer[1];
         SetupLODLayer(0, LandscapeLayerA.instance);
@@ -76,6 +81,18 @@ public partial class TerrainLODManager : Node
 
     public void SetupLODLayer(int lodLevel, IChunkBasedDataLayer layer)
     {
+        if (layers == null || lodLevel >= layers.Length)
+        {
+            int newSize = lodLevel + 1;
+            var newLayers = new TerrainLODLayer[newSize];
+            if (layers != null)
+            {
+                for (int i = 0; i < layers.Length; i++)
+                    newLayers[i] = layers[i];
+            }
+            layers = newLayers;
+        }
+
         layers[lodLevel] = new TerrainLODLayer
         {
             layer = layer,
@@ -86,21 +103,25 @@ public partial class TerrainLODManager : Node
     public void RegisterChunk(int lodLevel, Point p, Terrain3DStorage terrain)
     {
         var idx = terrain.RegionOffsets.IndexOf(new Vector2I(-p.x, -p.y));
-        if (idx > 0)
+        if (layers != null && lodLevel < layers.Length && idx >= 0)
+        {
             layers[lodLevel].chunks[p] = new TerrainInfo
             {
                 heightMap = terrain.HeightMaps[idx],
                 colorMap = terrain.ColorMaps[idx],
                 controlMap = terrain.ControlMaps[idx]
             };
+        }
         else
-            GD.Print($"Point: {p} doesn't actually correspond to a region in Terrain3D ({string.Join(',', terrain.RegionOffsets)}");
+        {
+            GD.Print($"Point: {p} doesn't actually correspond to a region in Terrain3D ({string.Join(',', terrain.RegionOffsets)}) or layers is not initialized properly.");
+        }
         anyRegistrationChanges = true;
     }
 
     public void UnregisterChunk(int lodLevel, Point p)
     {
-        if (layers[lodLevel].chunks.Remove(p, out TerrainInfo info))
+        if (layers != null && lodLevel < layers.Length && layers[lodLevel].chunks.Remove(p, out var info))
         {
             anyRegistrationChanges = true;
         }
@@ -115,18 +136,21 @@ public partial class TerrainLODManager : Node
             // Find bounds of current terrain chunks in all layers.
             GridBounds lowestLayerBounds = GridBounds.Empty();
             int divisor = 1;
-            for (int i = layers.Length - 1; i >= 0; i--)
+            if (layers != null)
             {
-                foreach (var kvp in layers[i].chunks)
+                for (int i = layers.Length - 1; i >= 0; i--)
                 {
-                    Point index = new Point(
-                        Crd.Div(kvp.Key.x, divisor),
-                        Crd.Div(kvp.Key.y, divisor)
-                    );
-                    lowestLayerBounds.Encapsulate(index);
-                }
+                    foreach (var kvp in layers[i].chunks)
+                    {
+                        Point index = new Point(
+                            Crd.Div(kvp.Key.x, divisor),
+                            Crd.Div(kvp.Key.y, divisor)
+                        );
+                        lowestLayerBounds.Encapsulate(index);
+                    }
 
-                divisor *= 2;
+                    divisor *= 2;
+                }
             }
 
             lastLowerLevelBounds = lowestLayerBounds;
@@ -134,12 +158,15 @@ public partial class TerrainLODManager : Node
             // Activate and deactivate terrain chunks.
 
             // // UnityEngine.Profiling.Profiler.BeginSample("HandleActivations"); //TODO: this maybe? https://docs.godotengine.org/en/latest/classes/class_performance.html
-            int level = layers.Length - 1;
-            for (int x = lowestLayerBounds.min.x; x < lowestLayerBounds.max.x; x++)
+            if (layers != null)
             {
-                for (int y = lowestLayerBounds.min.y; y < lowestLayerBounds.max.y; y++)
+                int level = layers.Length - 1;
+                for (int x = lowestLayerBounds.min.x; x < lowestLayerBounds.max.x; x++)
                 {
-                    HandleAreaIfCovered(level, new Point(x, y));
+                    for (int y = lowestLayerBounds.min.y; y < lowestLayerBounds.max.y; y++)
+                    {
+                        HandleAreaIfCovered(level, new Point(x, y));
+                    }
                 }
             }
             // // UnityEngine.Profiling.Profiler.EndSample();
@@ -149,45 +176,53 @@ public partial class TerrainLODManager : Node
         if (debugLODBounds.visible)
         {
             DebugDrawer.alpha = debugLODBounds.animAlpha;
-            var lowestLayer = layers[^1].layer;
-            VisualizationManager.BeginDebugDraw(lowestLayer, 0);
-            DebugDrawer.DrawRect(
-                lastLowerLevelBounds.min * lowestLayer.chunkW,
-                lastLowerLevelBounds.max * lowestLayer.chunkW,
-                0,
-                Colors.Yellow);
-            VisualizationManager.EndDebugDraw();
-
-            for (int i = 0; i < layers.Length; i++)
+            if (layers != null && layers.Length > 0)
             {
-                VisualizationManager.BeginDebugDraw(layers[i].layer, 0);
-                foreach (var kvp in layers[i].chunks)
-                {
-                    TerrainInfo info = kvp.Value;
-                    Image terrain = info.heightMap;
-                    bool active = !terrain.IsInvisible();
-                    if (active || (VisualizationManager.instance != null && VisualizationManager.instance.debugSeparate.visible)
-                       )
-                    {
-                        Vector2 pos = kvp.Key * layers[i].layer.chunkSize;
-                        if (layers[i].layer is IGodotInstance godotLayer)
-                        {
-                            Node? terrainNode = godotLayer.LayerRoot();
-                            if (terrainNode == null) continue;
-                            Vector2 size = new Vector2(layers[i].layer.chunkW * .5f, layers[i].layer.chunkH * .5f); //terrain.terrainData.size.xz() * 0.5f;
-                            // Draw rect.
-                            if (active)
-                                DebugDrawer.DrawRect(pos, pos + size * 2, 0, levelColors[i]);
+                var lowestLayer = layers[^1].layer;
+                VisualizationManager.BeginDebugDraw(lowestLayer, 0);
+                DebugDrawer.DrawRect(
+                    lastLowerLevelBounds.min * lowestLayer.chunkW,
+                    lastLowerLevelBounds.max * lowestLayer.chunkW,
+                    0,
+                    Colors.Yellow);
+                VisualizationManager.EndDebugDraw();
+            }
 
-                            // Draw cross in LOD color.
-                            Vector3 center = (pos + size).xoy();
-                            float crossSize = size.X * (active ? 1f : 0.3f);
-                            DebugDrawer.DrawCross(center, crossSize, levelColors[i]);
+            if (layers != null)
+            {
+                for (int i = 0; i < layers.Length; i++)
+                {
+                    VisualizationManager.BeginDebugDraw(layers[i].layer, 0);
+                    foreach (var kvp in layers[i].chunks)
+                    {
+                        TerrainInfo info = kvp.Value;
+                        if (info.heightMap == null)
+                            continue;
+                        Image terrain = info.heightMap;
+                        bool active = !terrain.IsInvisible();
+                        if (active || (VisualizationManager.instance != null && VisualizationManager.instance.debugSeparate.visible)
+                           )
+                        {
+                            Vector2 pos = kvp.Key * layers[i].layer.chunkSize;
+                            if (layers[i].layer is IGodotInstance godotLayer)
+                            {
+                                Node? terrainNode = godotLayer.LayerRoot();
+                                if (terrainNode == null) continue;
+                                Vector2 size = new Vector2(layers[i].layer.chunkW * .5f, layers[i].layer.chunkH * .5f); //terrain.terrainData.size.xz() * 0.5f;
+                                // Draw rect.
+                                if (active)
+                                    DebugDrawer.DrawRect(pos, pos + size * 2, 0, levelColors[i]);
+
+                                // Draw cross in LOD color.
+                                Vector3 center = (pos + size).xoy();
+                                float crossSize = size.X * (active ? 1f : 0.3f);
+                                DebugDrawer.DrawCross(center, crossSize, levelColors[i]);
+                            }
                         }
                     }
-                }
 
-                VisualizationManager.EndDebugDraw();
+                    VisualizationManager.EndDebugDraw();
+                }
             }
 
             DebugDrawer.alpha = 1f;
@@ -208,7 +243,7 @@ public partial class TerrainLODManager : Node
 
 
     // Returns true if full area is handled.
-    bool HandleAreaIfCovered(int lodLevel, Point index, bool alreadyChecked = false, TerrainInfo selfInfo = null)
+    bool HandleAreaIfCovered(int lodLevel, Point index, bool alreadyChecked = false, TerrainInfo? selfInfo = null)
     {
         // if (lodLevel < 0)
         return false;
@@ -266,15 +301,15 @@ public partial class TerrainLODManager : Node
         // 	DisableRecursive(subLevel, subPointC, true, subInfoC);
         // 	DisableRecursive(subLevel, subPointD, true, subInfoD);
         // }
-        return true;
+        // return true;
     }
 
-    void DisableRecursive(int lodLevel, Point index, bool alreadyChecked = false, TerrainInfo info = null)
+    void DisableRecursive(int lodLevel, Point index, bool alreadyChecked = false, TerrainInfo? info = null)
     {
         if (lodLevel < 0)
             return;
 
-        if (!alreadyChecked)
+        if (!alreadyChecked && layers != null)
             layers[lodLevel].chunks.TryGetValue(index, out info);
 
         if (info != null)
@@ -308,11 +343,16 @@ public partial class TerrainLODManager : Node
 
     public bool HasChunkAt(Vector3 position)
     {
-        return terrain3DWrapper.Storage.HasRegion(position);
+        return terrain3DWrapper != null && terrain3DWrapper.Storage.HasRegion(position);
     }
 
     public void CreateNewChunkAt(Vector3 position)
     {
+        if (terrain3DWrapper == null)
+        {
+            GD.PushError("terrain3DWrapper is null.");
+            return;
+        }
         var addRegionError = terrain3DWrapper.Storage.AddRegion(position, null, false);
         switch (addRegionError)
         {
@@ -326,6 +366,8 @@ public partial class TerrainLODManager : Node
 
     public Terrain3DRegion GetChunkAt(Vector3 position)
     {
+        if (terrain3DWrapper == null)
+            throw new System.InvalidOperationException("terrain3DWrapper is null.");
         return Terrain3DRegion.Create(terrain3DWrapper.Storage.GetRegionIndex(position));
     }
 }

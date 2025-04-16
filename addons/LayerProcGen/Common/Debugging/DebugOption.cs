@@ -34,7 +34,7 @@ namespace Runevision.Common {
 
 	public class DebugToggle : DebugFoldout {
 		public bool enabled { get; protected set; }
-		public event Action<bool> Callback;
+		public event Action<bool>? Callback;
 
 		// Animation related properties.
 		public float animValueLinear { get; protected set; }
@@ -44,7 +44,7 @@ namespace Runevision.Common {
 		public bool visible { get { return animValueLinear > 0; } }
 		public float animTarget { get { return enabled ? 1f : 0f; } }
 
-		public static DebugToggle Create(string namePath, bool defaultOn = false, Action<bool> callback = null) {
+		public static DebugToggle Create(string namePath, bool defaultOn = false, Action<bool>? callback = null) {
 			DebugToggle option = GetOrCreate<DebugToggle>(namePath);
 			option.enabledSelf = defaultOn;
 			if (callback != null)
@@ -69,7 +69,7 @@ namespace Runevision.Common {
 
 			enabled = enabledSelf;
 			if (enabled) {
-				DebugFoldout curParent = parent;
+				DebugFoldout? curParent = parent;
 				while (curParent != null) {
 					if (curParent is DebugToggle toggle) {
 						enabled &= toggle.enabled;
@@ -134,7 +134,7 @@ namespace Runevision.Common {
 	}
 
 	public class DebugRadioButton : DebugToggle {
-		public static new DebugRadioButton Create(string namePath, bool defaultOn = false, Action<bool> callback = null) {
+		public static new DebugRadioButton Create(string namePath, bool defaultOn = false, Action<bool>? callback = null) {
 			DebugRadioButton option = GetOrCreate<DebugRadioButton>(namePath);
 			if (defaultOn)
 				option.enabledSelf = true;
@@ -147,16 +147,19 @@ namespace Runevision.Common {
 		public override void HandleClick() {
 			if (enabledSelf)
 				return;
-			foreach (DebugOption sibling in parent.children)
-				if (sibling is DebugRadioButton radioButton)
-					radioButton.SetEnabled(radioButton == this);
+			if (parent != null)
+			{
+				foreach (DebugOption sibling in parent.children)
+					if (sibling is DebugRadioButton radioButton)
+						radioButton.SetEnabled(radioButton == this);
+			}
 		}
 	}
 
 	public class DebugButton : DebugOption {
-		public event Action Callback;
+		public event Action? Callback;
 
-		public static DebugButton Create(string namePath, Action callback = null) {
+		public static DebugButton Create(string namePath, Action? callback = null) {
 			DebugButton option = GetOrCreate<DebugButton>(namePath);
 			if (callback != null)
 				option.Callback += callback;
@@ -258,13 +261,13 @@ namespace Runevision.Common {
 	/// </remarks>
 	public abstract class DebugOption {
 
-		public string name { get; protected set; }
+		public string? name { get; protected set; }
 		public bool hidden { get; set; }
-		public DebugFoldout parent;
+		public DebugFoldout? parent;
 
 		public static DebugFoldout root = DebugFoldout.CreateRoot();
 
-		public static event Action UIChanged;
+		public static event Action? UIChanged;
 		protected static void NotifyUIChanged() { UIChanged?.Invoke(); }
 
 		static Dictionary<string, DebugOption> s_Options = new Dictionary<string, DebugOption>();
@@ -280,7 +283,7 @@ namespace Runevision.Common {
 		public virtual void UpdateAnimValue(float delta) { }
 
 		internal static T GetOrCreate<T>(string namePath) where T : DebugOption, new() {
-			if (s_Options.TryGetValue(namePath, out DebugOption existingOption))
+			if (s_Options.TryGetValue(namePath, out DebugOption? existingOption))
 				return (T)existingOption;
 
 			string[] path = namePath.Split('/');
@@ -293,7 +296,7 @@ namespace Runevision.Common {
 					name = name.Substring(1);
 					isFoldout = true;
 				}
-				DebugOption matchingOption = parent.children.FirstOrDefault(
+				DebugOption? matchingOption = parent.children.FirstOrDefault(
 					e =>
 						(self || e is DebugFoldout)
 						&& (isFoldout == (e.GetType() == typeof(DebugFoldout)))
@@ -305,7 +308,7 @@ namespace Runevision.Common {
 						return (T)matchingOption;
 					}
 					// If we're here, we know that matchingOption exists and is a DebugToggle.
-					parent = matchingOption as DebugFoldout;
+					parent = (DebugFoldout)matchingOption;
 				}
 				else if (!self) {
 					// Create parent option if it doesn't already exist.
@@ -325,7 +328,7 @@ namespace Runevision.Common {
 					return (T)option;
 				}
 			}
-			return null;
+			throw new InvalidOperationException($"Failed to create or find a DebugOption for: {namePath}");
 		}
 	}
 }

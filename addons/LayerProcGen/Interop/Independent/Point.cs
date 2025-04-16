@@ -84,7 +84,7 @@ namespace Runevision.Common {
 			return (a.x != b.x) || (a.y != b.y);
 		}
 
-		public override bool Equals(object obj) {
+		public override bool Equals(object? obj) {
 			if (!(obj is Point other))
 				return false;
 			return (x == other.x) && (y == other.y);

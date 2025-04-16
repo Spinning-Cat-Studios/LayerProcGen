@@ -147,7 +147,7 @@ namespace Runevision.Common {
 			return (a.min != b.min) || (a.max != b.max);
 		}
 
-		public override bool Equals(object obj) {
+		public override bool Equals(object? obj) {
 			if (!(obj is GridBounds3 other))
 				return false;
 			return (min == other.min) && (max == other.max);
