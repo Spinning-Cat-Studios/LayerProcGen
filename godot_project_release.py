@@ -72,6 +72,7 @@ def build_addon_release():
     shutil.copy("CHANGELOG.md", ADDON_DIR + "CHANGELOG.md")
     shutil.copy("LICENSE.md", ADDON_DIR + "LICENSE.md")
     shutil.copy("Third Party Notices.md", ADDON_DIR + "Third Party Notices.md")
+    shutil.copy("scripts/assets/project.godot", PROJECT_DIR + "project.godot")
 
     # Create package.json file
     PLUGIN_CFG = PLUGIN_CFG.replace("VERSION", version)
