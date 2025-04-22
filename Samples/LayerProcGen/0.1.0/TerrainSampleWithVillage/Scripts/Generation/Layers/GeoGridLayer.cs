@@ -7,8 +7,6 @@ using Godot;
 using Godot.Collections;
 using Godot.Util;
 
-namespace Runevision.TerrainSample.Generation.Layers;
-
 // The GeoGridLayer is an intermediary layer between the LocationLayer and the CultivationLayer.
 // Each CultivationLayer chunk needs data well outside of its own bounds.
 // If they were each to calculate that themselves, there would be a lot of redundant

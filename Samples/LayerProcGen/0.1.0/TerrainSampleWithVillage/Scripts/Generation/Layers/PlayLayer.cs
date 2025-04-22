@@ -2,8 +2,6 @@ using System.Reflection;
 using Godot;
 using Runevision.LayerProcGen;
 
-namespace Runevision.TerrainSample.Generation.Layers;
-
 public class PlayChunk : LayerChunk<PlayLayer, PlayChunk>
 {
     public PlayChunk()

@@ -15,8 +15,6 @@ using Terrain3DBindings;
 using Terrain3D.Scripts.Generation.Layers;
 using Terrain3D.Scripts.Utilities;
 
-namespace Runevision.TerrainSample.Generation.Layers;
-
 public struct MapQueuedTerrainCallback<L, C> : IQueuedAction
 	where L : LandscapeLayer<L, C>, new()
 	where C : LandscapeChunk<L, C>, new()
