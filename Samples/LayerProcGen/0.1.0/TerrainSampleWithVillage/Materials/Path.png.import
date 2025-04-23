@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c4ub7u4yqdypn"
-path.s3tc="res://.godot/imported/Path.png-400a3a5a1af1263153b7a7af9e2657f6.s3tc.ctex"
+path.s3tc="res://.godot/imported/Path.png-350e490b32338efe0015c283733fd896.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Samples/LayerProcGen/0.1.0/TerrainSample/Materials/Path.png"
-dest_files=["res://.godot/imported/Path.png-400a3a5a1af1263153b7a7af9e2657f6.s3tc.ctex"]
+source_file="res://Samples/LayerProcGen/0.1.0/TerrainSampleWithVillage/Materials/Path.png"
+dest_files=["res://.godot/imported/Path.png-350e490b32338efe0015c283733fd896.s3tc.ctex"]
 
 [params]
 

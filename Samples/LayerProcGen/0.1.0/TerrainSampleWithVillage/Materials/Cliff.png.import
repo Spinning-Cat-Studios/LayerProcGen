@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cg8juqfm7vfsy"
-path.s3tc="res://.godot/imported/Cliff.png-c945f4f82070a373f8334add5b1b6258.s3tc.ctex"
+path.s3tc="res://.godot/imported/Cliff.png-b214fd2c155048a6a5c72fbd86176065.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://Samples/LayerProcGen/0.1.0/TerrainSample/Materials/Cliff.png"
-dest_files=["res://.godot/imported/Cliff.png-c945f4f82070a373f8334add5b1b6258.s3tc.ctex"]
+source_file="res://Samples/LayerProcGen/0.1.0/TerrainSampleWithVillage/Materials/Cliff.png"
+dest_files=["res://.godot/imported/Cliff.png-b214fd2c155048a6a5c72fbd86176065.s3tc.ctex"]
 
 [params]
 

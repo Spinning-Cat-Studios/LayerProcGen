@@ -7,6 +7,8 @@ using Godot;
 using Godot.Collections;
 using Godot.Util;
 
+namespace Runevision.VillageSample.Generation.Layers;
+
 // The GeoGridLayer is an intermediary layer between the LocationLayer and the CultivationLayer.
 // Each CultivationLayer chunk needs data well outside of its own bounds.
 // If they were each to calculate that themselves, there would be a lot of redundant
@@ -122,5 +124,36 @@ public class GeoGridLayer : ChunkBasedDataLayer<GeoGridLayer, GeoGridChunk>
                 controls[z, x] = chunk.controls[localPointInChunk.y, localPointInChunk.x];
             }
         );
+    }
+
+    public GeoGridChunk GetChunk(Point index)
+    {
+        lock(chunks)
+        {
+            GeoGridChunk chunk = chunks[index];
+            return chunk != null && chunk.level >= 0 ? chunk : null;
+        }
+    }
+
+    public float SampleHeightAt(float x, float z)
+    {
+        int cellSize = TerrainPathFinder.halfCellSize;
+
+        int globalX = Mathf.FloorToInt(x / cellSize);
+        int globalZ = Mathf.FloorToInt(z / cellSize);
+
+        Point chunkIndex = new Point(
+            globalX / gridChunkRes.x,
+            globalZ / gridChunkRes.y
+        );
+
+        GeoGridChunk chunk = GetChunk(chunkIndex);
+        if (chunk == null)
+            return 0f; // default fallback if chunk not available
+
+        int localX = Mathf.PosMod(globalX, gridChunkRes.x);
+        int localZ = Mathf.PosMod(globalZ, gridChunkRes.y);
+
+        return chunk.heights[localZ, localX];
     }
 }
