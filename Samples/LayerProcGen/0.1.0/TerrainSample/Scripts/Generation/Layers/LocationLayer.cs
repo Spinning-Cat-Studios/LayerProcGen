@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Godot;
 using Godot.Util;
 
-namespace Runevision.TerrainSample.Generation.Layers;
+
 
 public class Location : IPoolable {
 	public Point position;

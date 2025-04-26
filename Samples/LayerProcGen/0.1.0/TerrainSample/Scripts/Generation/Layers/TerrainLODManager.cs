@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using Terrain3D.Scripts.Utilities;
 using Terrain3DBindings;
 
-namespace Runevision.TerrainSample.Generation.Layers;
-
 public partial class TerrainLODManager : Node
 {
 	public static TerrainLODManager instance;

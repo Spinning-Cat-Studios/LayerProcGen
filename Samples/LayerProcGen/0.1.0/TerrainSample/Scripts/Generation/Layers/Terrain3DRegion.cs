@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using Godot;
 using Terrain3DBindings;
 
-namespace Runevision.TerrainSample.Generation.Layers;
-
 public class Terrain3DRegion
 {
 	public readonly int regionIndex;
