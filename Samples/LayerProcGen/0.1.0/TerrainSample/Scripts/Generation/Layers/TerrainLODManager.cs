@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Terrain3D.Scripts.Utilities;
 using Terrain3DBindings;
 
-namespace Terrain3D.Scripts.Generation.Layers;
+namespace Runevision.TerrainSample.Generation.Layers;
 
 public partial class TerrainLODManager : Node
 {

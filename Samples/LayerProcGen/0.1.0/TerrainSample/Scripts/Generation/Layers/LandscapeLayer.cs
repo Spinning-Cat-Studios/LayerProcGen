@@ -12,7 +12,6 @@ using Godot.Util;
 using Runevision.Common;
 using Runevision.LayerProcGen;
 using Terrain3DBindings;
-using Terrain3D.Scripts.Generation.Layers;
 using Terrain3D.Scripts.Utilities;
 
 namespace Runevision.TerrainSample.Generation.Layers;

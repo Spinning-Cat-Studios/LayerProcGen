@@ -3,6 +3,8 @@ using Runevision.LayerProcGen;
 using System.Collections.Generic;
 using Godot;
 
+namespace Runevision.VillageSample.Generation.Layers;
+
 public class CultivationChunk : LayerChunk<CultivationLayer, CultivationChunk> {
 	public List<PathSpec> paths = new List<PathSpec>();
 

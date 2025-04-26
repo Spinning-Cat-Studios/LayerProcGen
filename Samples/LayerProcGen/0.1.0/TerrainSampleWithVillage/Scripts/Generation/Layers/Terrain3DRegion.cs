@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using Godot;
-using Terrain3D.Scripts.Generation.Layers;
 using Terrain3DBindings;
 
-namespace Terrain3D.Scripts.Utilities;
+namespace Runevision.VillageSample.Generation.Layers;
 
 public class Terrain3DRegion
 {
