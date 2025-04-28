@@ -117,5 +117,4 @@ func _update_mouselook():
 		rotate_object_local(Vector3(1,0,0), deg_to_rad(-pitch))
 
 func _on_speed_slider_value_changed(new_speed: float) -> void:
-	print("now here with speed:", new_speed)
 	speed_multi = new_speed
