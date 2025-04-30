@@ -94,7 +94,18 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
 
         // Start interpreting at the chunk's origin
         var interpreter = new TurtleInterpreter(GetHeightAt);
-        interpreter.Interpret(lSequence, gridOrigin.ToVector3(), Vector3.Forward, housePositions);
+        float cellSize = 3; // Todo: consider using the actual cell size
+        var worldOrigin = new Vector3(
+            gridOrigin.x * cellSize,
+            0,
+            gridOrigin.y * cellSize
+        );
+        interpreter.Interpret(
+            lSequence,
+            worldOrigin,
+            Vector3.Forward,
+            housePositions
+        );
 
         GD.Print("House positions: " + string.Join(", ", housePositions));
 
