@@ -76,11 +76,15 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
         var rnd = new System.Random(chunkSeed);
         var alphabet = rules.Keys.ToArray();
 
-        // Build a 3‑char axiom
-        string axiom = string.Concat(
-            Enumerable.Range(0, 3)
-                    .Select(_ => alphabet[rnd.Next(alphabet.Length)])
-        );
+        // Build a 3‑char axiom with at least one 'B'
+        var picks = Enumerable
+            .Range(0, 3)
+            .Select(_ => alphabet[rnd.Next(alphabet.Length)])
+            .ToList();
+        // ensure at least one 'B'
+        if (!picks.Contains('B'))
+            picks[rnd.Next(picks.Count)] = 'B';
+        string axiom = string.Concat(picks);
 
         // Generate the L-system sequence
         var lSystem = new LSystem(axiom, rules);
