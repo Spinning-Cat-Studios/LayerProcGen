@@ -11,10 +11,15 @@ public class TurtleInterpreter
     TurtleState state;
     Stack<TurtleState> stack = new();
     Func<Vector3, float> getHeight;
+    readonly int worldSeed;
+    readonly bool noisy;
 
-    public TurtleInterpreter(Func<Vector3, float> heightSampler)
+    public TurtleInterpreter(Func<Vector3,float> heightSampler,
+                             int seed = 0, bool useHeadingNoise = true)
     {
         getHeight = heightSampler;
+        worldSeed = seed;
+        noisy     = useHeadingNoise;
     }
 
     public void Interpret(string sequence, Vector3 startPosition, Vector3 startDirection, List<Vector3> housePositions)
@@ -54,7 +59,16 @@ public class TurtleInterpreter
                     break;
 
                 case 'D':
-                    state.Position += state.Direction * roadLength;
+                    int sub = Mathf.CeilToInt(roadLength);  // 1-unit steps
+                    for (int i = 0; i < sub; ++i)
+                    {
+                        if (noisy)
+                            state.Direction = HeadingNoise.PerturbDirection(
+                                                state.Direction, state.Position,
+                                                worldSeed);
+
+                        state.Position += state.Direction;
+                    }
                     break;
             }
         }
