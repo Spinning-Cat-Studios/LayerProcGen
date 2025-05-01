@@ -62,10 +62,17 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
         // Generate your L-system string
         var rules = new Dictionary<char, string>
         {
-            {'A', "ADA"},
-            {'B', "D[B]D[B]"},
-            {'C', "ACA"},
-            {'D', "DA"}
+            // straight road that sprouts two perpendicular side-streets
+            // after every “block”
+            { 'S', "D[BD]D[CD]" },   
+
+            // once a side street is created, let it keep repeating the same pattern
+            { 'B', "D[BD]" },
+            { 'C', "D[CD]" },
+
+            // ‘D’ expands to road + house so we actually see buildings
+            { 'D', "DA" },
+            { 'A', "A" }              // terminal
         };
 
         // Mix in chunk coords so each chunk seed varies
@@ -94,11 +101,16 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
 
         // Start interpreting at the chunk's origin
         var interpreter = new TurtleInterpreter(GetHeightAt);
-        float cellSize = 3; // Todo: consider using the actual cell size
+        float spacingModifier = 3.75f; // Todo: consider using the actual cell size
+        float jitterRange = 150f;
+        // deterministic jitter
+        float jitterX = (float)(rnd.NextDouble() * (2 * jitterRange) - jitterRange);
+        float jitterZ = (float)(rnd.NextDouble() * (2 * jitterRange) - jitterRange);
+
         var worldOrigin = new Vector3(
-            gridOrigin.x * cellSize,
+            gridOrigin.x * spacingModifier + jitterX,
             0,
-            gridOrigin.y * cellSize
+            gridOrigin.y * spacingModifier + jitterZ
         );
         interpreter.Interpret(
             lSequence,
