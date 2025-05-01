@@ -4,6 +4,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 using Godot.Util;
+using System;
 
 public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillageChunk>
 {
@@ -15,7 +16,7 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
     const int GLOBAL_SEED = 12345; // TODO: make this configurable and/or random but stored in the database when finally hook this up to a backend.
     const int CHUNK_X_RANDOM = 73856093;
     const int CHUNK_Y_RANDOM = 19349663;
-    const int LSYSTEM_ITERATIONS = 3;
+    const int LSYSTEM_ITERATIONS = 5;
 
     public override void Create(int level, bool destroy)
     {
@@ -54,33 +55,19 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
         return _chunkParent;
     }
 
-
     void Build()
     {
         gridOrigin = index * layer.chunkW;
-
-        // Generate your L-system string
-        var rules = new Dictionary<char, string>
-        {
-            // straight road that sprouts two perpendicular side-streets
-            // after every “block”
-            { 'S', "D[BD]D[CD]" },   
-
-            // once a side street is created, let it keep repeating the same pattern
-            { 'B', "D[BD]" },
-            { 'C', "D[CD]" },
-
-            // ‘D’ expands to road + house so we actually see buildings
-            { 'D', "DA" },
-            { 'A', "A" }              // terminal
-        };
-
         // Mix in chunk coords so each chunk seed varies
         int chunkSeed = GLOBAL_SEED
                     + index.x * CHUNK_X_RANDOM
                     + index.y * CHUNK_Y_RANDOM;
         
-        var rnd = new System.Random(chunkSeed);
+        var rnd = new Random(chunkSeed);
+
+        // Generate your L-system string
+        var rules = new StochasticRewriteTable(rnd).Build();
+
         var alphabet = rules.Keys.ToArray();
 
         // Build a 3‑char axiom with at least one 'B'
@@ -94,7 +81,7 @@ public class LSystemVillageChunk : LayerChunk<LSystemVillageLayer, LSystemVillag
         string axiom = string.Concat(picks);
 
         // Generate the L-system sequence
-        var lSystem = new LSystem(axiom, rules);
+        var lSystem = new StochasticLSystem(axiom, rules, rnd);
         string lSequence = lSystem.Generate(LSYSTEM_ITERATIONS);
 
         GD.Print("L-System Sequence: " + lSequence);
